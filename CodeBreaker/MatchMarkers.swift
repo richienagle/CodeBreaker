@@ -30,14 +30,23 @@ struct MatchMarkers: View {
     }
     
     func matchMarker(peg: Int) -> some View {
-        let exactCount: Int = matches.count(where: { match in match == .exact})
-        let foundCount: Int = matches.count(where: { match in match != .nomatch})
+        // get how many times .exact appears
+        // matches.count takes a function
+        // func isExact(match: Match) -> Bool {
+        //    match == .exact
+        // }
+        //let exactCount = matches.count(where: isExact)
+        // $0 is the first arguement
+        //let exactCount: Int = matches.count(where: { match in match == .exact})
+        
+        let exactCount = matches.count { $0 == .exact}
+        let foundCount = matches.count { $0 != .nomatch}
         return Circle()
-            .fill(exactCount > peg ? Color.primary : Color.clear)
+            .fill(exactCount > peg ? Color.primary : Color.clear)  //ternary poerator
             .strokeBorder(foundCount > peg ? Color.primary : Color.clear, lineWidth: 2).aspectRatio(1, contentMode: .fit)
     }
 }
 
 #Preview {
-    MatchMarkers(matches:[.exact, .inexact, .nomatch])
+    MatchMarkers(matches:[.exact, .inexact, .inexact, .nomatch])
 }
