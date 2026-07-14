@@ -12,21 +12,27 @@ struct CodeBreakerView: View {
     
     var body: some View {
         VStack {
-            view(for: game.masterCode)
+            //view(for: game.masterCode)
             ScrollView() {
-                
                 view(for: game.guess)
                 ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                     view(for: game.attempts[index])
                 }
             }
-
-            //pegs(colors: game.attempts.last?.pegs ?? [])
+            Button("Restart") {
+                withAnimation {
+                    let choices = game.pegChoices
+                    game = CodeBreaker(pegChoices: choices)
+                }
+            }
+            .foregroundColor(.white)
+            .font(.title)
+            .buttonStyle(.glassProminent)
         }
         .padding()
     }
     
-    var guessButtion: some View {
+    var guessButton: some View {
         Button("Guess") {
             withAnimation {
                 game.attemptGuess()
@@ -61,7 +67,7 @@ struct CodeBreakerView: View {
                         MatchMarkers(matches: matches)
                     } else {
                         if code.kind == .guess {
-                            guessButtion
+                            guessButton
                         }
                     }
             }
