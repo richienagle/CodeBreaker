@@ -16,32 +16,46 @@ struct MatchMarkers: View {
     var matches: [Match]
     
     var body: some View {
-        VStack {
-            HStack {
-                matchMaker(peg: 0)
-                matchMaker(peg: 1)
-            }
-            HStack {
-                matchMaker(peg: 2)
-                matchMaker(peg: 3)
+        // Create a compact, square-ish grid of markers based on the number of matches
+        let count = matches.count
+        let columns = Int(ceil(sqrt(Double(max(count, 1)))))
+        let rows = Int(ceil(Double(count) / Double(columns)))
+        VStack(spacing: 4) {
+            ForEach(0..<rows, id: \.self) { row in
+                HStack(spacing: 4) {
+                    ForEach(0..<columns, id: \.self) { col in
+                        let index = row * columns + col
+                        if index < count {
+                            matchMaker(peg: index)
+                        } else {
+                            // Fillers to keep grid shape
+                            Circle()
+                                .fill(Color.clear)
+                                .overlay(Circle().stroke(Color.clear))
+                                .aspectRatio(1, contentMode: .fit)
+                        }
+                    }
+                }
             }
         }
     }
     
     func matchMaker(peg: Int) -> some View {
-        let exactCount = matches.count { $0 == .exact}
-                                    // { (match: Match) -> Bool in match == .exact
-                                    // (where: {match in match == .exact})
-                                    // (where: ($0 == .exact)}
-        let foundCount = matches.count { $0 != .nomatch}
+        let isExact = (peg < matches.count) && (matches[peg] == .exact)
+        let isFound = (peg < matches.count) && (matches[peg] != .nomatch)
         return Circle()
-            .fill(exactCount > peg ? Color.primary : Color.clear)
-            .strokeBorder(foundCount > peg ? Color.primary : Color.clear, lineWidth:2).aspectRatio(1, contentMode: .fit)
+            .fill(isExact ? Color.primary : Color.clear)
+            .strokeBorder(isFound ? Color.primary : Color.clear, lineWidth: 2)
+            .aspectRatio(1, contentMode: .fit)
     }
     
 }
 
 
 #Preview {
-    MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
+    VStack {
+        MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact])
+        MatchMarkers(matches: [.exact, .inexact, .nomatch, .exact, .inexact, .nomatch])
+    }
+    .padding()
 }

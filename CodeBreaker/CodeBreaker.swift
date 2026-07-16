@@ -15,15 +15,20 @@ extension Peg {
 }
 
 struct CodeBreaker {
-    var masterCode: Code = Code(kind: .master)
-    var guess: Code = Code(kind: .guess)
+    var masterCode: Code
+    var guess: Code
     var attempts: [Code] = []
     let pegChoices: [Peg]       //the set of allowed choices for the game
+    let pegCount: Int
     
-    init(pegChoices: [Peg]?) {
+    init(pegChoices: [Peg]?, pegCount: Int = 4) {
+        let count = max(3, min(pegCount, 6))
+        self.pegCount = count
         let defaults: [Peg] = [.blue, .red, .green, .yellow]
         let choices = pegChoices ?? defaults
         self.pegChoices = choices
+        masterCode = Code(kind: .master, pegCount: count)
+        guess = Code(kind: .guess, pegCount: count)
         masterCode.randomize(from: choices)
         //print(masterCode)
     }
@@ -47,7 +52,7 @@ struct CodeBreaker {
 
 struct Code: CustomStringConvertible {
     var kind: Kind
-    var pegs: [Peg] = Array(repeating: Code.missingPeg, count: 4)
+    var pegs: [Peg]
     
     static let missingPeg: Peg = .missing
     
@@ -56,6 +61,11 @@ struct Code: CustomStringConvertible {
         case guess
         case attempt([Match])
         case unknown
+    }
+    
+    init(kind: Kind, pegCount: Int) {
+        self.kind = kind
+        self.pegs = Array(repeating: Code.missingPeg, count: pegCount)
     }
     
     mutating func randomize(from pegChoices: [Peg]) {
@@ -133,4 +143,3 @@ struct Code: CustomStringConvertible {
     //        return results
     //    }
     
-

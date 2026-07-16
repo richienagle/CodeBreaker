@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
-    @State private var game =  CodeBreaker(pegChoices: [.blue, .red, .green, .yellow])
+    @State private var game =  CodeBreaker(pegChoices: [.blue, .red, .green, .yellow], pegCount: 5)
     
     var body: some View {
         VStack {
@@ -22,7 +22,8 @@ struct CodeBreakerView: View {
             Button("Restart") {
                 withAnimation {
                     let choices = game.pegChoices
-                    game = CodeBreaker(pegChoices: choices)
+                    let count = Int.random(in: 3...6)
+                    game = CodeBreaker(pegChoices: choices, pegCount: count)
                 }
             }
             .foregroundColor(.white)
@@ -78,3 +79,4 @@ struct CodeBreakerView: View {
 #Preview {
     CodeBreakerView()
 }
+
