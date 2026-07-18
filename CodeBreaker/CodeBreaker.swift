@@ -2,35 +2,23 @@
 //  CodeBreaker.swift
 //  CodeBreaker
 //
-//  Created by benjamin on 7/10/26.
+//  Created by CS193p Instructor on 4/9/25.
 //
 
-//import Foundation
-import SwiftUI
+import SwiftUI // bad! wants to eventually be Foundation
 
 typealias Peg = Color
 
-extension Peg {
-    static let missing = Color.clear
-}
-
 struct CodeBreaker {
-    var masterCode: Code = Code(kind: .master(isHidden: true), pegCount: 4)
-    var guess: Code
+    var masterCode: Code = Code(kind: .master(isHidden: true))
+    var guess: Code = Code(kind: .guess)
     var attempts: [Code] = []
-    let pegChoices: [Peg]       //the set of allowed choices for the game
-    let pegCount: Int
+    let pegChoices: [Peg]
     
-    init(pegChoices: [Peg]?, pegCount: Int = 4) {
-        let count = max(3, min(pegCount, 6))
-        self.pegCount = count
-        let defaults: [Peg] = [.blue, .red, .green, .yellow]
-        let choices = pegChoices ?? defaults
-        self.pegChoices = choices
-        masterCode = Code(kind: .master(isHidden: true), pegCount: count)
-        guess = Code(kind: .guess, pegCount: count)
-        masterCode.randomize(from: choices)
-        //print(masterCode)
+    init(pegChoices: [Peg] = [.red, .green, .blue, .yellow]) {
+        self.pegChoices = pegChoices
+        masterCode.randomize(from: pegChoices)
+        print(masterCode)
     }
     
     var isOver: Bool {
@@ -41,6 +29,7 @@ struct CodeBreaker {
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
+        guess.reset()
         if isOver {
             masterCode.kind = .master(isHidden: false)
         }
@@ -51,41 +40,13 @@ struct CodeBreaker {
         guess.pegs[index] = peg
     }
     
-    mutating func changeGuessPeg(at index: Int) {
-        let existingPeg = guess.pegs[index]
-        if let indexOfExistingPegInPegChoices = pegChoices.firstIndex(of: existingPeg) {
-            let newPeg = pegChoices[(indexOfExistingPegInPegChoices + 1) % pegChoices.count]
-            guess.pegs[index] = newPeg
-        } else {
-            guess.pegs[index] = pegChoices.first ?? Code.missingPeg
-        }
-    }
+//    mutating func changeGuessPeg(at index: Int) {
+//        let existingPeg = guess.pegs[index]
+//        if let indexOfExistingPegInPegChoices = pegChoices.firstIndex(of: existingPeg) {
+//            let newPeg = pegChoices[(indexOfExistingPegInPegChoices + 1) % pegChoices.count]
+//            guess.pegs[index] = newPeg
+//        } else {
+//            guess.pegs[index] = pegChoices.first ?? Code.missingPeg
+//        }
+//    }
 }
-
-
-    //
-    //      *** Original ***
-    //
-    //      func match(against otherCode: Code) -> [Match] {
-
-    //         var results: [Match] = Array(repeating: .nomatch, count: pegs.count)
-
-    //        //Pass 1: Exact matches
-    //        for index in pegs.indices.reversed() {
-    //            if pegsToMatch.count > index, pegsToMatch[index] == pegs[index] {
-    //                results[index] = .exact
-    //                pegsToMatch.remove(at: index)
-    //            }
-    //        }
-    //        //Pass 2: Inexact matches
-    //        for index in pegs.indices {
-    //            if results[index] != .exact {
-    //                if let matchIndex = pegsToMatch.firstIndex(of: pegs[index]) {
-    //                    results[index] = .inexact
-    //                    pegsToMatch.remove(at: matchIndex)
-    //                }
-    //            }
-    //        }
-    //        return results
-    //    }
-    
