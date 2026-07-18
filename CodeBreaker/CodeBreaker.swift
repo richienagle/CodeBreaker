@@ -15,7 +15,7 @@ extension Peg {
 }
 
 struct CodeBreaker {
-    var masterCode: Code
+    var masterCode: Code = Code(kind: .master(isHidden: true), pegCount: 4)
     var guess: Code
     var attempts: [Code] = []
     let pegChoices: [Peg]       //the set of allowed choices for the game
@@ -27,16 +27,28 @@ struct CodeBreaker {
         let defaults: [Peg] = [.blue, .red, .green, .yellow]
         let choices = pegChoices ?? defaults
         self.pegChoices = choices
-        masterCode = Code(kind: .master, pegCount: count)
+        masterCode = Code(kind: .master(isHidden: true), pegCount: count)
         guess = Code(kind: .guess, pegCount: count)
         masterCode.randomize(from: choices)
         //print(masterCode)
+    }
+    
+    var isOver: Bool {
+        attempts.last?.pegs == masterCode.pegs
     }
     
     mutating func attemptGuess() {
         var attempt = guess
         attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
+        if isOver {
+            masterCode.kind = .master(isHidden: false)
+        }
+    }
+    
+    mutating func setGuessPeg(_ peg: Peg, at index: Int) {
+        guard guess.pegs.indices.contains(index) else { return }
+        guess.pegs[index] = peg
     }
     
     mutating func changeGuessPeg(at index: Int) {

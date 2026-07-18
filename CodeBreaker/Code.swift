@@ -11,14 +11,21 @@ import SwiftUI
 struct Code: CustomStringConvertible {
     var kind: Kind
     var pegs: [Peg]
-    
+
     static let missingPeg: Peg = .missing
     
     enum Kind: Equatable {
-        case master
+        case master(isHidden: Bool)
         case guess
         case attempt([Match])
         case unknown
+    }
+  
+    var isHidden: Bool {
+        switch kind {
+        case .master(let isHidden): return isHidden
+        default: return false
+        }
     }
     
     init(kind: Kind, pegCount: Int) {
@@ -31,6 +38,10 @@ struct Code: CustomStringConvertible {
             pegs[index] = pegChoices.randomElement() ?? Code.missingPeg
         }
     }
+    
+ //   mutating func reset() {
+ //       pegs = Array(repeating: Code.missingPeg, count: pegs.count)
+ //   }
     
     var matches: [Match]? {
         switch kind {
